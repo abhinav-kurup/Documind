@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv
+venv/
+.idea/
+.vscode/
+documind-ai/data/chroma/
+documind-ai/data/logs/
+*.log
+prd.md
