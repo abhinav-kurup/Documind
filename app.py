@@ -56,6 +56,14 @@ with st.sidebar:
     if st.button("🔄 Reset System", help="Clear memory and reload components"):
         st.session_state.clear()
         st.rerun()
+    
+    if st.button("🗑️ Clear Database", help="Delete all documents from vector store", type="secondary"):
+        try:
+            st.session_state.vector_store.clear_database()
+            st.success("Database cleared successfully!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Failed to clear database: {e}")
 
     uploaded_files = st.file_uploader("Upload PDFs", type=['pdf'], accept_multiple_files=True)
     
@@ -90,11 +98,13 @@ with st.sidebar:
                         st.error(f"Error processing {uploaded_file.name}: {e}")
                 
                 if all_chunks:
-                    st.write(f"embedding {len(all_chunks)} chunks...")
+                    st.write(f"Embedding {len(all_chunks)} chunks...")
+                    st.session_state.vector_store.add_chunks(all_chunks)
                     status.update(label="Processing Complete!", state="complete", expanded=False)
                     st.success(f"Successfully processed {len(all_chunks)} chunks into Knowledge Base.")
                 else:
                     status.update(label="Processing Failed", state="error")
+
 
 
 with tab_chat:
@@ -114,7 +124,9 @@ with tab_chat:
                 if docs:
                     st.write("**Retrieved Documents:**")
                     for i, doc in enumerate(docs):
-                        st.caption(f"Source {i+1} - Page {doc['metadata'].get('page_number', '?')}")
+                        filename = doc['metadata'].get('source', f'Document {i+1}')
+                        page = doc['metadata'].get('page_number', '?')
+                        st.caption(f"{filename} - Page {page}")
                         st.text(doc.get('content', '')[:500] + "...")
 
     prompt = st.chat_input("Ask a question about your documents...")
@@ -128,7 +140,7 @@ with tab_chat:
         
         with chat_container:
             with st.chat_message("assistant"):
-                with st.spinner("Thinking..."):
+                with st.spinner("🤔 Thinking..."):
                     try:
                         query_id = str(uuid.uuid4())
                         result_state = st.session_state.orchestrator.run(
@@ -140,9 +152,7 @@ with tab_chat:
                         response = result_state.get("final_response") or "I couldn't generate an answer. Please check the Audit Logs or ensure Ollama is running."
                         
                         st.session_state.audit_logger.log_query(query_id, result_state)
-                        
                         st.markdown(response)
-                        
                         st.session_state.messages.append({"role": "assistant", "content": response})
                         
                         st.session_state.last_sources = {
@@ -152,8 +162,12 @@ with tab_chat:
                         
                     except Exception as e:
                         error_msg = f"An error occurred: {e}"
-                        st.markdown(error_msg)
+                        st.error(error_msg)
                         st.session_state.messages.append({"role": "assistant", "content": error_msg})
+
+
+
+
 
 
 with tab_audit:
