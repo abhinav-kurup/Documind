@@ -9,3 +9,6 @@ documind-ai/data/chroma/
 documind-ai/data/logs/
 *.log
 prd.md
+test_ollama.py
+
+data/
