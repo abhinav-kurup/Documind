@@ -1,0 +1,71 @@
+from langgraph.graph import StateGraph, END
+from core.state import AgentState
+from agents.router import RouterAgent, reject_query
+from agents.retrieval import RetrievalAgent
+from agents.extraction import ExtractionAgent
+from agents.analysis import AnalysisAgent
+import logging
+
+logger = logging.getLogger(__name__)
+
+def route_query(state: AgentState) -> str:
+    route = state.get("route", "document")
+    if route == "conversational":
+        return "reject"
+    else:
+        return "retrieval"
+
+class Orchestrator:
+    def __init__(self):
+        self.router_agent = RouterAgent()
+        self.retrieval_agent = RetrievalAgent()
+        self.extraction_agent = ExtractionAgent()
+        self.analysis_agent = AnalysisAgent()
+        
+        builder = StateGraph(AgentState)
+        
+        builder.add_node("router", self.router_agent.invoke)
+        builder.add_node("reject", reject_query)
+        builder.add_node("retrieval", self.retrieval_agent.invoke)
+        builder.add_node("extraction", self.extraction_agent.invoke)
+        builder.add_node("analysis", self.analysis_agent.invoke)
+        
+        builder.set_entry_point("router")
+        
+        builder.add_conditional_edges(
+            "router",
+            route_query,
+            {
+                "reject": "reject",
+                "retrieval": "retrieval"
+            }
+        )
+        
+        builder.add_edge("retrieval", "extraction")
+        builder.add_edge("extraction", "analysis")
+        builder.add_edge("reject", END)
+        builder.add_edge("analysis", END)
+        
+        self.workflow = builder.compile()
+
+    def run(self, query: str, query_id: str = None, audit_logger = None) -> AgentState:
+        import uuid
+        query_id = query_id or str(uuid.uuid4())
+        
+        initial_state = {
+            "query": query,
+            "query_id": query_id,
+            "audit_logger": audit_logger,
+            "messages": [],
+            "retrieved_docs": [],
+            "extracted_data": {},
+            "final_response": None,
+            "route": None,
+            "audit_log": [{"step": "Orchestrator", "status": "Start", "query": query}]
+        }
+        
+        logger.info(f"Starting workflow for query: {query}")
+        result = self.workflow.invoke(initial_state)
+        logger.info("Workflow completed")
+        
+        return result
