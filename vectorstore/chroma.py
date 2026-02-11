@@ -59,12 +59,13 @@ class VectorStoreManager:
     def clear_database(self):
         try:
             self.vectordb.delete_collection()
-            logger.info("Vector database cleared successfully")
             self.vectordb = Chroma(
                 persist_directory=self.persist_directory,
                 embedding_function=self.embedding_function,
                 collection_name=self.collection_name
             )
+            logger.info("Vector database cleared successfully")
+            
         except Exception as e:
             logger.error(f"Error clearing database: {e}")
             raise e
