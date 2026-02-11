@@ -5,6 +5,7 @@ from agents.retrieval import RetrievalAgent
 from agents.extraction import ExtractionAgent
 from agents.analysis import AnalysisAgent
 import logging
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,6 @@ class Orchestrator:
         self.workflow = builder.compile()
 
     def run(self, query: str, query_id: str = None, audit_logger = None) -> AgentState:
-        import uuid
         query_id = query_id or str(uuid.uuid4())
         
         initial_state = {
