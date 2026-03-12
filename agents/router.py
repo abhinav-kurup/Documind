@@ -5,6 +5,7 @@ import logging
 from langchain_community.chat_models import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from utils.helpers import log_agent_step
 
 logger = logging.getLogger(__name__)
 
@@ -101,17 +102,14 @@ class RouterAgent:
             logger.info(f"RouterAgent: LLM classified as '{route}'")
             
 
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(
-                    query_id=query_id,
-                    step_name="RouterAgent",
-                    status="Success",
-                    route=route,
-                    method="llm",
-                    classification=classification
-                )
+            log_agent_step(
+                state=state,
+                step_name="RouterAgent",
+                status="Success",
+                route=route,
+                method="llm",
+                classification=classification
+            )
             
             return {
                 "route": route,
@@ -131,17 +129,14 @@ class RouterAgent:
             logger.info(f"RouterAgent: Fallback classified as '{route}'")
             
 
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(
-                    query_id=query_id,
-                    step_name="RouterAgent",
-                    status="Success",
-                    route=route,
-                    method="fallback",
-                    error=str(e)
-                )
+            log_agent_step(
+                state=state,
+                step_name="RouterAgent",
+                status="Success",
+                route=route,
+                method="fallback",
+                error=str(e)
+            )
             
             return {
                 "route": route,
@@ -177,10 +172,7 @@ def reject_query(state):
         "- Extract data from tables"
     )
     
-    audit_logger = state.get("audit_logger")
-    query_id = state.get("query_id")
-    if audit_logger and query_id:
-        audit_logger.log_step(query_id, "RejectionHandler", "Out-of-Scope", query=state.get("query"))
+    log_agent_step(state, "RejectionHandler", "Out-of-Scope", query=state.get("query"))
     
     return {
         "final_response": response,

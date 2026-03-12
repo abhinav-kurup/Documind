@@ -36,7 +36,7 @@ class DocumentChunker:
                     "chunk_index": chunk_counter,
                     "text": chunk_text,
                     "metadata": {
-                        "source": "pdf", 
+                        # "source": "pdf", 
                         **page.get("metadata", {})
                     }
                 })

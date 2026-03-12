@@ -1,4 +1,5 @@
 from core.state import AgentState
+from utils.helpers import log_agent_step
 from typing import Dict, Any, List
 import logging
 
@@ -27,16 +28,13 @@ class RetrievalAgent:
             
             logger.info(f"RetrievalAgent: Found {len(docs)} documents")
             
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(
-                    query_id=query_id,
-                    step_name="RetrievalAgent",
-                    status="Success",
-                    retrieved_count=len(docs),
-                    query=query
-                )
+            log_agent_step(
+                state=state,
+                step_name="RetrievalAgent",
+                status="Success",
+                retrieved_count=len(docs),
+                query=query
+            )
 
             return {
                 "retrieved_docs": docs,

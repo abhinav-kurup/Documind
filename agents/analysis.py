@@ -5,6 +5,7 @@ import logging
 from langchain_community.chat_models import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from utils.helpers import log_agent_step
 
 logger = logging.getLogger(__name__)
 
@@ -63,10 +64,7 @@ class AnalysisAgent:
             answer = chain.invoke({"query": query, "context": context_str})
             logger.info("AnalysisAgent: Generation successful")
             
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(query_id, "AnalysisAgent", "Success", response_length=len(answer))
+            log_agent_step(state, "AnalysisAgent", "Success", response_length=len(answer))
             
             return {
                 "final_response": answer,
@@ -80,10 +78,7 @@ class AnalysisAgent:
             logger.error(f"AnalysisAgent Error: {e}")
             
             # Progressive logging for errors
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(query_id, "AnalysisAgent", "Error", error=str(e))
+            log_agent_step(state, "AnalysisAgent", "Error", error=str(e))
             
             return {
                 "final_response": f"I encountered an error during analysis: {str(e)}. \n\nEnsure your LLM (Ollama) is running and accessible.",

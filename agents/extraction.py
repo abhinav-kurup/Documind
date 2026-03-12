@@ -5,8 +5,7 @@ import logging
 from langchain_community.chat_models import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-
-
+from utils.helpers import log_agent_step
 logger = logging.getLogger(__name__)
 
 class ExtractionAgent:
@@ -56,10 +55,7 @@ class ExtractionAgent:
             result = chain.invoke({"query": query, "context": context})
             
             # Progressive logging
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(query_id, "ExtractionAgent", "Success", extracted_length=len(result))
+            log_agent_step(state, "ExtractionAgent", "Success", extracted_length=len(result))
             
             return {
                 "extracted_data": {"content": result},
@@ -71,10 +67,7 @@ class ExtractionAgent:
             }
         except Exception as e:
             logger.error(f"ExtractionAgent Error: {e}")
-            audit_logger = state.get("audit_logger")
-            query_id = state.get("query_id")
-            if audit_logger and query_id:
-                audit_logger.log_step(query_id, "ExtractionAgent", "Error", error=str(e))
+            log_agent_step(state, "ExtractionAgent", "Error", error=str(e))
             return {
                 "audit_log": [{
                     "step": "ExtractionAgent", 
@@ -84,7 +77,4 @@ class ExtractionAgent:
             }
     
     def _log_skip(self, state: AgentState, reason: str):
-        audit_logger = state.get("audit_logger")
-        query_id = state.get("query_id")
-        if audit_logger and query_id:
-            audit_logger.log_step(query_id, "ExtractionAgent", "Skipped", reason=reason)
+        log_agent_step(state, "ExtractionAgent", "Skipped", reason=reason)

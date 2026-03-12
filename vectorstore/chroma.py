@@ -54,8 +54,6 @@ class VectorStoreManager:
     def similarity_search(self, query: str, k: int = 5) -> List[Any]:
         return self.vectordb.similarity_search(query, k=k)
 
-    def retriever(self):
-        return self.vectordb.as_retriever()
     
     def clear_database(self):
         try:
