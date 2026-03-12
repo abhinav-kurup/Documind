@@ -28,7 +28,7 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-ORCHESTRATOR_VERSION = 2  
+ORCHESTRATOR_VERSION = 22
 
 if "orchestrator" not in st.session_state or st.session_state.get("orchestrator_version") != ORCHESTRATOR_VERSION:
     try:
