@@ -6,8 +6,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Ensure pytesseract can find the binary if not in PATH (though Dockerfile installs it)
-# pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract' # Typical linux path
 
 class OCRProcessor:
     def __init__(self, lang: str = 'eng'):

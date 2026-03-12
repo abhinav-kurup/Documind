@@ -1,14 +1,15 @@
-import chromadb
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from typing import List, Dict, Any
 import os
 import logging
+from core.config import Config
 
 logger = logging.getLogger(__name__)
 
 class VectorStoreManager:
-    def __init__(self, persist_directory: str = "data/chroma", collection_name: str = "documind_collection"):
+    def __init__(self, persist_directory: str = None, collection_name: str = "documind_collection"):
+        persist_directory = persist_directory or Config.CHROMA_PERSIST_DIRECTORY
         os.makedirs(persist_directory, exist_ok=True)
         
         self.persist_directory = persist_directory

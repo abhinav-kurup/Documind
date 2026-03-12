@@ -60,11 +60,9 @@ class PDFLoader:
         """
         Determines if a page is likely scanned based on text density and presence of images.
         """
-        # If very little text but has images covering the page, it's likely scanned.
         text_len = len(text.strip())
         if text_len < 50:
             images = page.get_images()
             if len(images) > 0:
-                # Could check image size coverage here for more accuracy
                 return True
         return False

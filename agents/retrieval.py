@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class RetrievalAgent:
-    def __init__(self):
+    def __init__(self,vector_store):
         self.vector_store = VectorStoreManager()
 
     def invoke(self, state: AgentState) -> Dict[str, Any]:

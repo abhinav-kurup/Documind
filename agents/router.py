@@ -23,7 +23,7 @@ class RouterAgent:
         )
         
     # ============================================================================
-    # KEYWORD-BASED FALLBACK (COMMENTED - Uncomment if LLM classification fails)
+    # KEYWORD-BASED FALLBACK
     # ============================================================================
     
     # # High-confidence conversational patterns (greetings, pleasantries)
@@ -69,18 +69,18 @@ class RouterAgent:
         prompt = ChatPromptTemplate.from_template(
             """You are a query classifier for a document analysis system.
 
-Classify the user's query into ONE of these categories:
+                Classify the user's query into ONE of these categories:
 
-1. "document" - Questions about specific information, data, or analysis that would require searching through documents
-   Examples: "What is the revenue?", "Summarize page 5", "Extract sales data"
+                1. "document" - Questions about specific information, data, or analysis that would require searching through documents
+                Examples: "What is the revenue?", "Summarize page 5", "Extract sales data"
 
-2. "conversational" - Greetings, pleasantries, or questions about the system itself (not about documents)
-   Examples: "Hello", "How are you?", "What can you do?", "Thanks"
+                2. "conversational" - Greetings, pleasantries, or questions about the system itself (not about documents)
+                Examples: "Hello", "How are you?", "What can you do?", "Thanks"
 
-Query: "{query}"
+                Query: "{query}"
 
-Respond with ONLY one word: "document" or "conversational"
-"""
+                Respond with ONLY one word: "document" or "conversational"
+            """
         )
         
         chain = prompt | self.llm | StrOutputParser()
@@ -100,7 +100,7 @@ Respond with ONLY one word: "document" or "conversational"
             
             logger.info(f"RouterAgent: LLM classified as '{route}'")
             
-            # Progressive logging
+
             audit_logger = state.get("audit_logger")
             query_id = state.get("query_id")
             if audit_logger and query_id:
@@ -130,7 +130,7 @@ Respond with ONLY one word: "document" or "conversational"
             
             logger.info(f"RouterAgent: Fallback classified as '{route}'")
             
-            # Progressive logging
+
             audit_logger = state.get("audit_logger")
             query_id = state.get("query_id")
             if audit_logger and query_id:
