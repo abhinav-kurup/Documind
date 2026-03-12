@@ -4,6 +4,7 @@ from agents.router import RouterAgent, reject_query
 from agents.retrieval import RetrievalAgent
 from agents.extraction import ExtractionAgent
 from agents.analysis import AnalysisAgent
+from vectorstore.chroma import VectorStoreManager
 import logging
 import uuid
 
@@ -17,9 +18,11 @@ def route_query(state: AgentState) -> str:
         return "retrieval"
 
 class Orchestrator:
-    def __init__(self):
+    def __init__(self,vector_store:VectorStoreManager = None):
+        if vector_store is None:
+            vector_store = VectorStoreManager()
         self.router_agent = RouterAgent()
-        self.retrieval_agent = RetrievalAgent()
+        self.retrieval_agent = RetrievalAgent(vector_store=vector_store)
         self.extraction_agent = ExtractionAgent()
         self.analysis_agent = AnalysisAgent()
         

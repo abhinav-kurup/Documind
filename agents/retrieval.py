@@ -1,4 +1,3 @@
-from vectorstore.chroma import VectorStoreManager
 from core.state import AgentState
 from typing import Dict, Any, List
 import logging
@@ -7,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 class RetrievalAgent:
     def __init__(self,vector_store):
-        self.vector_store = VectorStoreManager()
+        self.vector_store = vector_store
 
     def invoke(self, state: AgentState) -> Dict[str, Any]:
         query = state.get("query", "")

@@ -33,7 +33,7 @@ ORCHESTRATOR_VERSION = 22
 if "orchestrator" not in st.session_state or st.session_state.get("orchestrator_version") != ORCHESTRATOR_VERSION:
     try:
         st.session_state.vector_store = VectorStoreManager()
-        st.session_state.orchestrator = Orchestrator()
+        st.session_state.orchestrator = Orchestrator(vector_store=st.session_state.vector_store)
         st.session_state.audit_logger = AuditLogger()
         st.session_state.loader = PDFLoader()
         st.session_state.chunker = DocumentChunker()
