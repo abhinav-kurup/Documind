@@ -28,17 +28,14 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 
-ORCHESTRATOR_VERSION = 22
-
-if "orchestrator" not in st.session_state or st.session_state.get("orchestrator_version") != ORCHESTRATOR_VERSION:
+if "orchestrator" not in st.session_state:
     try:
         st.session_state.vector_store = VectorStoreManager()
         st.session_state.orchestrator = Orchestrator(vector_store=st.session_state.vector_store)
         st.session_state.audit_logger = AuditLogger()
         st.session_state.loader = PDFLoader()
         st.session_state.chunker = DocumentChunker()
-        st.session_state.orchestrator_version = ORCHESTRATOR_VERSION
-        logger.info(f"Orchestrator initialized (version {ORCHESTRATOR_VERSION})")
+        logger.info("Orchestrator initialized")
     except Exception as e:
         st.error(f"Failed to initialize components: {e}")
 

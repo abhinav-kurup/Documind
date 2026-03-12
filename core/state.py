@@ -4,6 +4,8 @@ import operator
 
 class AgentState(TypedDict):
     query: str
+    query_id: Optional[str]
+    audit_logger: Optional[Any]
     messages: Annotated[List[BaseMessage], operator.add]
     route: Optional[str]
     retrieved_docs: List[Dict[str, Any]]
