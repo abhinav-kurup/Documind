@@ -6,9 +6,7 @@ langchain-core
 langchain-text-splitters
 langgraph
 pymupdf
-pytesseract
-Pillow
-opencv-python
+
 transformers
 torch
 pandas

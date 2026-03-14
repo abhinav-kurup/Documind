@@ -42,27 +42,13 @@ class PDFLoader:
 
         for i, page in enumerate(doc):
             text = page.get_text()
-            is_scanned_page = self.is_scanned(page, text)
             
             page_data = {
                 "page_number": i + 1,
                 "text": text,
-                "is_scanned": is_scanned_page,
-                "images": page.get_images(full=True),
                 "metadata": doc.metadata
             }
             processed_pages.append(page_data)
 
         doc.close()
         return processed_pages
-
-    def is_scanned(self, page: fitz.Page, text: str) -> bool:
-        """
-        Determines if a page is likely scanned based on text density and presence of images.
-        """
-        text_len = len(text.strip())
-        if text_len < 50:
-            images = page.get_images()
-            if len(images) > 0:
-                return True
-        return False
