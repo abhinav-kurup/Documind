@@ -77,7 +77,6 @@ class AnalysisAgent:
         except Exception as e:
             logger.error(f"AnalysisAgent Error: {e}")
             
-            # Progressive logging for errors
             log_agent_step(state, "AnalysisAgent", "Error", error=str(e))
             
             return {

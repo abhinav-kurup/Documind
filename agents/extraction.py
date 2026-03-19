@@ -54,7 +54,6 @@ class ExtractionAgent:
         try:
             result = chain.invoke({"query": query, "context": context})
             
-            # Progressive logging
             log_agent_step(state, "ExtractionAgent", "Success", extracted_length=len(result))
             
             return {
