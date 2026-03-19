@@ -11,7 +11,7 @@
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-green.svg)](https://www.langchain.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Features](#-features) • [Demo](#demo) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#-tech-stack)
+[Features](#-features) • [Demo](#demo) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#tech-stack)
 
 </div>
 
@@ -135,7 +135,7 @@ http://localhost:8501
 
 ---
 
-## 📖 Usage
+## Usage
 
 ### Uploading Documents
 
@@ -167,7 +167,7 @@ http://localhost:8501
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Core Technologies
 
