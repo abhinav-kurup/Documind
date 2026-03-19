@@ -277,77 +277,14 @@ Documind/
 
 ---
 
-## 🔧 Advanced Features
-
-### Progressive Audit Logging
-
-Every agent step is logged in real-time to `data/logs/`:
-- `audit_trail.jsonl` - Full query results
-- `audit_trail_steps.jsonl` - Individual agent steps
-
-Example log entry:
-```json
-{
-  "query_id": "abc-123",
-  "timestamp": "2025-12-23T02:00:00",
-  "step": "RetrievalAgent",
-  "status": "Success",
-  "retrieved_count": 5
-}
-```
-
-### Custom Chunk Size
-
-Adjust in `document_processing/chunking.py`:
-```python
-DocumentChunker(
-    chunk_size=2000,    # Characters per chunk
-    chunk_overlap=200   # Overlap for context
-)
-```
-
-### Retrieval Top-K
-
-Modify in `agents/retrieval.py`:
-```python
-results = self.vector_store.similarity_search(query, k=5)
-# Increase k for more context, decrease for faster search
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Ollama Connection Error
-```bash
-# Check if Ollama is running
-curl http://localhost:11434/api/tags
-
-# Restart Ollama
-ollama serve
-```
-
-### ChromaDB Lock Error
-```bash
-# Stop Streamlit first, then:
-rm -rf data/chroma/*
-```
-
-### Slow Performance
-- Use smaller model: `qwen2.5:3b` instead of `llama3`
-- Reduce chunk size in `chunking.py`
-- Lower retrieval k value in `retrieval.py`
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/CrazyFeature`)
+3. Commit your changes (`git commit -m 'Add some CrazyFeature'`)
+4. Push to the branch (`git push origin feature/CrazyFeature`)
 5. Open a Pull Request
 
 ---
@@ -364,12 +301,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Ollama](https://ollama.ai/) for local LLM inference
 - [ChromaDB](https://www.trychroma.com/) for vector storage
 - [Streamlit](https://streamlit.io/) for the UI framework
-
----
-
-## 📞 Contact
-
-**Project Link:** [https://github.com/yourusername/Documind](https://github.com/yourusername/Documind)
 
 ---
 
