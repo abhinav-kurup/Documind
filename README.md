@@ -11,7 +11,7 @@
 [![LangChain](https://img.shields.io/badge/LangChain-Latest-green.svg)](https://www.langchain.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Usage](#-usage) • [Tech Stack](#-tech-stack)
+[Features](#-features) • [Demo](#demo) • [Installation](#installation) • [Usage](#usage) • [Tech Stack](#-tech-stack)
 
 </div>
 
@@ -70,7 +70,7 @@ DocuMind AI is a powerful document analysis platform that enables you to have in
 
 ---
 
-## 🖼️ Demo
+## Demo
 
 ### Main Interface
 ![DocuMind AI Interface](assets/screenshot_main_interface.png)
