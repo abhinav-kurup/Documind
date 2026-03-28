@@ -156,6 +156,7 @@ with tab_chat:
                             "audit_log": result_state.get("audit_log", []),
                             "retrieved_docs": result_state.get("retrieved_docs", [])
                         }
+                        st.rerun()
                         
                     except Exception as e:
                         error_msg = f"An error occurred: {e}"
