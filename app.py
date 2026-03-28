@@ -47,22 +47,17 @@ tab_chat, tab_audit = st.tabs(["💬 Chat", "📊 Audit Logs"])
 
 
 with st.sidebar:
-    st.header("🗂️ Knowledge Base")
-    st.text(f"Model: {Config.MODEL_NAME}")
-    
-    if st.button("🔄 Reset System", help="Clear memory and reload components"):
-        st.session_state.clear()
-        st.rerun()
-    
-    if st.button("🗑️ Clear Database", help="Delete all documents from vector store", type="secondary"):
-        try:
-            st.session_state.vector_store.clear_database()
-            st.success("Database cleared successfully!")
-            st.rerun()
-        except Exception as e:
-            st.error(f"Failed to clear database: {e}")
+    st.header("📤 Document Upload")
 
-    uploaded_files = st.file_uploader("Upload PDFs", type=['pdf'], accept_multiple_files=True)
+    if "uploader_key" not in st.session_state:
+        st.session_state.uploader_key = 1
+
+    uploaded_files = st.file_uploader(
+        "Upload PDFs", 
+        type=['pdf'], 
+        accept_multiple_files=True,
+        key=f"uploader_{st.session_state.uploader_key}"
+    )
     
     if st.button("Process Documents", type="primary"):
         if not uploaded_files:
@@ -99,8 +94,39 @@ with st.sidebar:
                     st.session_state.vector_store.add_chunks(all_chunks)
                     status.update(label="Processing Complete!", state="complete", expanded=False)
                     st.success(f"Successfully processed {len(all_chunks)} chunks into Knowledge Base.")
+                    
+                    import time
+                    time.sleep(1.2)
+                    st.session_state.uploader_key += 1
+                    st.rerun()
                 else:
                     status.update(label="Processing Failed", state="error")
+
+    st.divider()
+    st.markdown("### Processed Documents")
+    
+    if "vector_store" in st.session_state:
+        docs = st.session_state.vector_store.get_processed_documents()
+        if docs:
+            for doc in docs:
+                st.markdown(f"- 📄 {doc}")
+        else:
+            st.caption("No documents processed yet.")
+            
+    st.divider()
+    st.markdown("### ⚙️ System Controls")
+    
+    if st.button("🗑️ Clear Database", help="Delete all documents from vector store", type="secondary", use_container_width=True):
+        try:
+            st.session_state.vector_store.clear_database()
+            st.success("Database cleared successfully!")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Failed to clear database: {e}")
+            
+    if st.button("🔄 Reset System", help="Clear memory and reload components", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
 
 
 
