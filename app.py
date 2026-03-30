@@ -168,7 +168,7 @@ with tab_chat:
                             audit_logger=st.session_state.audit_logger
                         )
                         
-                        response = result_state.get("final_response") or "I couldn't generate an answer. Please check the Audit Logs or ensure Ollama is running."
+                        response = result_state.get("final_response") or "I apologize, but I could not generate an answer. Please check the Audit Logs for more details."
                         
                         st.session_state.audit_logger.log_query(query_id, result_state)
                         st.markdown(response)
