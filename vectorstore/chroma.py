@@ -54,6 +54,26 @@ class VectorStoreManager:
     def similarity_search(self, query: str, k: int = 5) -> List[Any]:
         return self.vectordb.similarity_search(query, k=k)
 
+    def similarity_search_with_score(self, query, k=4, filter=None):
+        return self.vectordb.similarity_search_with_score(
+            query=query,
+            k=k,
+            filter=filter
+        )
+
+    def get_processed_documents(self) -> List[str]:
+        try:
+            data = self.vectordb.get(include=["metadatas"])
+            metadatas = data.get("metadatas", [])
+            sources = set()
+            for meta in metadatas:
+                if meta and "source" in meta:
+                    sources.add(meta["source"])
+            return sorted(list(sources))
+        except Exception as e:
+            logger.error(f"Error getting processed documents: {e}")
+            return []
+
     
     def clear_database(self):
         try:
