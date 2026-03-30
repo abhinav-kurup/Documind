@@ -123,10 +123,6 @@ with st.sidebar:
             st.rerun()
         except Exception as e:
             st.error(f"Failed to clear database: {e}")
-            
-    if st.button("🔄 Reset System", help="Clear memory and reload components", use_container_width=True):
-        st.session_state.clear()
-        st.rerun()
 
 
 
