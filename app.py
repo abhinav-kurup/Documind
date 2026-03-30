@@ -194,4 +194,10 @@ with tab_audit:
     st.header("System Audit Trail")
     if st.button("Refresh Logs"):
         logs = st.session_state.audit_logger.get_logs()
+        
+        import json
+        for log in logs:
+            if "audit_trail" in log:
+                log["audit_trail"] = json.dumps(log["audit_trail"], indent=2)
+                
         st.dataframe(logs)
