@@ -10,6 +10,9 @@ class RetrievalAgent:
         self.vector_store = vector_store
 
     def invoke(self, state: AgentState) -> Dict[str, Any]:
+        from utils.helpers import dump_agent_state
+        dump_agent_state(state, "RetrievalAgent")
+
         query = state.get("query", "")
         if not query:
             return {"audit_log": [{"step": "RetrievalAgent", "status": "Skipped"}]}

@@ -15,55 +15,19 @@ class RouterAgent:
     document retrieval or should be rejected as out-of-scope.
     """
     
-    def __init__(self):
-        self.llm = ChatOllama(
-            model=Config.MODEL_NAME,
-            base_url=Config.OLLAMA_BASE_URL,
-            temperature=0, 
-            timeout=10  
-        )
+    def __init__(self, model_identifier: str = None):
+        from core.llm import get_llm
+        model_identifier = model_identifier or Config.MODEL_NAME
+        self.llm = get_llm(model_identifier, temperature=0.0)
         
-    # ============================================================================
-    # KEYWORD-BASED FALLBACK
-    # ============================================================================
-    
-    # # High-confidence conversational patterns (greetings, pleasantries)
-    # CONVERSATIONAL_KEYWORDS = [
-    #     'hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening',
-    #     'how are you', 'how do you do', 'nice to meet', 'pleased to meet',
-    #     'thanks', 'thank you', 'bye', 'goodbye', 'see you', 'talk to you later',
-    #     'who are you', 'what is your name', 'introduce yourself'
-    # ]
-    # 
-    # # Strong document-related keywords
-    # STRONG_DOCUMENT_KEYWORDS = [
-    #     'revenue', 'profit', 'loss', 'sales', 'income', 'expenses', 'costs',
-    #     'earnings', 'margin', 'growth', 'decline', 'increase', 'decrease',
-    #     'report', 'document', 'page', 'section', 'chapter', 'paragraph',
-    #     'table', 'chart', 'figure', 'graph', 'diagram', 'image',
-    #     'according to', 'mentioned', 'stated', 'written', 'says', 'contains',
-    #     'extract', 'summarize', 'summary', 'analyze', 'analysis', 'compare',
-    #     'quarter', 'year', 'fy', 'q1', 'q2', 'q3', 'q4', 'fiscal'
-    # ]
-    # 
-    # # Question words that need context (weak indicators)
-    # WEAK_DOCUMENT_KEYWORDS = [
-    #     'what', 'when', 'where', 'who', 'how', 'why', 'which',
-    #     'show', 'tell', 'find', 'get', 'give', 'list', 'explain', 'describe'
-    # ]
-    # 
-    # # Meta/system questions (should be rejected)
-    # META_KEYWORDS = [
-    #     'what can you do', 'what are your capabilities', 'how do you work',
-    #     'help', 'how to use', 'instructions', 'guide'
-    # ]
-    
-    # ============================================================================
-    
+
     def invoke(self, state: AgentState) -> Dict[str, Any]:
         """
         Classifies query using LLM into: 'document' or 'conversational'
         """
+        from utils.helpers import dump_agent_state
+        dump_agent_state(state, "RouterAgent")
+
         query = state.get("query", "").strip()
         
         # LLM Classification
@@ -163,6 +127,9 @@ class RouterAgent:
         return "document"
 
 def reject_query(state):
+    from utils.helpers import dump_agent_state
+    dump_agent_state(state, "RejectionAgent")
+
     response = (
         "I'm sorry, but I can only answer questions about the documents you've uploaded. "
         "Your query appears to be conversational or out of scope.\n\n"

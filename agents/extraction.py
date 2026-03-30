@@ -9,17 +9,15 @@ from utils.helpers import log_agent_step
 logger = logging.getLogger(__name__)
 
 class ExtractionAgent:
-    def __init__(self, model_name: str = None):
-        model_name = model_name or Config.MODEL_NAME
-        base_url = Config.OLLAMA_BASE_URL
-        self.llm = ChatOllama(
-            model=model_name, 
-            base_url=base_url, 
-            temperature=0,
-            timeout=30  
-        )
+    def __init__(self, model_identifier: str = None):
+        from core.llm import get_llm
+        model_identifier = model_identifier or Config.MODEL_NAME
+        self.llm = get_llm(model_identifier, temperature=0.1)
 
     def invoke(self, state: AgentState) -> Dict[str, Any]:
+        from utils.helpers import dump_agent_state
+        dump_agent_state(state, "ExtractionAgent")
+
         logger.info("ExtractionAgent: Process started")
         query = state.get("query", "")
         docs = state.get("retrieved_docs", [])
@@ -38,6 +36,8 @@ class ExtractionAgent:
             """
             You are an expert data extraction agent.
             Extract the specific information requested in the query from the context below.
+            ONLY extract tables or data that match the user's exact topic. 
+            Ignore all other tabular data in the context. If a table does not match the prompt, DO NOT include it.
             Output the result as a structured JSON or Markdown table.
             
             Query: {query}

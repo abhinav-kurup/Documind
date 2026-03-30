@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from core.state import AgentState
 from agents.router import RouterAgent, reject_query
-from agents.retrieval import RetrievalAgent
+from agents.retrieval2 import RetrievalAgent
 from agents.extraction import ExtractionAgent
 from agents.analysis import AnalysisAgent
 from vectorstore.chroma import VectorStoreManager
@@ -70,5 +70,8 @@ class Orchestrator:
         logger.info(f"Starting workflow for query: {query}")
         result = self.workflow.invoke(initial_state)
         logger.info("Workflow completed")
+        
+        from utils.helpers import dump_agent_state
+        dump_agent_state(result, "FinalOutput")
         
         return result

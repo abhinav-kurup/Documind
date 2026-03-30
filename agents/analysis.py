@@ -10,18 +10,16 @@ from utils.helpers import log_agent_step
 logger = logging.getLogger(__name__)
 
 class AnalysisAgent:
-    def __init__(self, model_name: str = None):
-        model_name = model_name or Config.MODEL_NAME
-        base_url = Config.OLLAMA_BASE_URL
-        logger.info(f"AnalysisAgent initialized with Base URL: {base_url}, Model: {model_name}")
-        self.llm = ChatOllama(
-            model=model_name, 
-            base_url=base_url, 
-            temperature=0.2,
-            timeout=30  
-        )
+    def __init__(self, model_identifier: str = None):
+        from core.llm import get_llm
+        model_identifier = model_identifier or Config.MODEL_NAME
+        logger.info(f"AnalysisAgent initialized with Model: {model_identifier}")
+        self.llm = get_llm(model_identifier, temperature=0.2)
 
     def invoke(self, state: AgentState) -> Dict[str, Any]:
+        from utils.helpers import dump_agent_state
+        dump_agent_state(state, "AnalysisAgent")
+
         logger.info("AnalysisAgent: Process started")
         query = state.get("query", "")
         docs = state.get("retrieved_docs", [])
@@ -45,7 +43,15 @@ class AnalysisAgent:
             Answer the user's query based ONLY on the provided context.
             If the answer is not in the context, state that you don't know.
             
-            You must cite your sources using the format [Source X (Page Y)].
+            IMPORTANT RULES:
+            - If [Extracted Data] is provided in the context, it contains the exact, pre-processed information the user requested. 
+            - You MUST present this extracted data to the user directly and clearly.
+            - Do not be overly literal; if the user asks for a "table" and the extracted data is JSON, format that JSON into a beautifully formatted Markdown table.
+            - Do not claim information is missing if it is present in the [Extracted Data] section.
+            
+            CITATION RULES:
+            - You must cite your sources using the format [Source X (Page Y)].
+            - NEVER cite "[Extracted Data]" as a source. If you are using information from the [Extracted Data] block, cite the original document name provided above it in the context (e.g., [document.pdf (Page 1)]).
             
             Query: {query}
             
@@ -80,7 +86,7 @@ class AnalysisAgent:
             log_agent_step(state, "AnalysisAgent", "Error", error=str(e))
             
             return {
-                "final_response": f"I encountered an error during analysis: {str(e)}. \n\nEnsure your LLM (Ollama) is running and accessible.",
+                "final_response": "I apologize, but I encountered a system issue while analyzing the documents. Please check the Audit Logs or verify the AI model is correctly configured.",
                 "audit_log": [{
                     "step": "AnalysisAgent", 
                     "status": "Error", 
