@@ -7,6 +7,7 @@ from langchain_community.chat_models import ChatOllama
 from core.state import AgentState
 from utils.helpers import log_agent_step, dump_agent_state
 from core.llm import get_llm
+from sentence_transformers import CrossEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,13 @@ class RetrievalAgent:
     def __init__(self, vector_store, model_identifier: str = "gemini/gemini-2.5-flash-lite"):
         self.vector_store = vector_store
         self.llm = get_llm(model_identifier, temperature=0.1)
+
+        try:
+            logger.info("Initializing CrossEncoder for reranking...")
+            self.cross_encoder = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+        except Exception as e:
+            logger.error(f"Failed to load CrossEncoder: {e}")
+            self.cross_encoder = None
 
         try:
             print("Structured")
@@ -109,9 +117,9 @@ class RetrievalAgent:
     def _retrieve_documents(self, query: str, plan: SearchPlan) -> List[Dict]:
         """
         Retrieval pipeline:
-        - multi-query search
+        - hybrid search per sub-query
         - deduplication
-        - ranking
+        - cross-encoder ranking against original query
         """
 
         all_docs = []
@@ -120,14 +128,14 @@ class RetrievalAgent:
         for sub_q in plan.sub_queries:
             logger.info(f"Sub-query: {sub_q}")
 
-            results = self.vector_store.similarity_search_with_score(
+            results = self.vector_store.hybrid_search(
                 sub_q,
-                k=4,
+                k=10,
                 filter=plan.filters
             )
 
-            for doc, score in results:
-                content = doc.page_content.strip()
+            for doc in results:
+                content = doc["content"].strip()
 
                 content_hash = hashlib.md5(content.encode()).hexdigest()
                 if content_hash in seen_hashes:
@@ -137,15 +145,28 @@ class RetrievalAgent:
 
                 all_docs.append({
                     "content": content,
-                    "metadata": doc.metadata,
-                    "score": score
+                    "metadata": doc["metadata"]
                 })
 
-        ranked_docs = sorted(
-            all_docs,
-            key=lambda x: x.get("score", 0),
-            reverse=True
-        )
+        # Cross-Encoder Reranking
+        if self.cross_encoder and all_docs:
+            try:
+                pairs = [[query, doc["content"]] for doc in all_docs]
+                scores = self.cross_encoder.predict(pairs)
+                
+                for idx, score in enumerate(scores):
+                    all_docs[idx]["score"] = float(score)
+                    
+                ranked_docs = sorted(
+                    all_docs,
+                    key=lambda x: x.get("score", -float('inf')),
+                    reverse=True
+                )
+            except Exception as e:
+                logger.error(f"Cross-encoder reranking failed: {e}")
+                ranked_docs = all_docs # Fallback to unranked
+        else:
+            ranked_docs = all_docs
 
         final_docs = [
             {
